@@ -16,6 +16,7 @@ K_SUB_KEY="sub_key"
 K_PATH="path"
 #There is a key like this one in another semantics. Should we unify?
 K_DESTINATION="destination"
+K_DEFAULT="__default"
 
 class ArgumentFromMetadata(Arguments.Argument):
     def __init__(self, sources, prepend, format_rule, options, options_from_metadata_path, sub_key, name=None, prefix=None, metadata_rules=None):
@@ -42,6 +43,7 @@ class ArgumentFromMetadata(Arguments.Argument):
             f = self.format_rule
             if self.prepend:
                 f = os.path.join(self.prepend, self.format_rule)
+
             value = _get_value(item, self.sources, f, options, self.sub_key)
             # TODO: make the -missing values handling- optionally lenient
 
@@ -95,6 +97,11 @@ def _get_value_o(item, sources, options, sub_key):
     if sub_key:
         if v in options and sub_key in options[v]:
             r = options[v][sub_key]
-    elif v in options:
-        r = options[v]
+        elif K_DEFAULT in options and sub_key in options[K_DEFAULT]:
+            r = options[K_DEFAULT][sub_key]
+    else:
+        if v in options:
+            r = options[v]
+        elif K_DEFAULT in options:
+            r = options[K_DEFAULT]
     return r
