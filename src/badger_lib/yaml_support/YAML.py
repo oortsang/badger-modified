@@ -17,6 +17,7 @@ from ..arguments import FilesInFolder
 from ..arguments import RulesMap
 from ..arguments import ArgumentFromMetadata
 from ..arguments import Whitelist
+from ..arguments import Blacklist
 from ..arguments import Range
 
 from ..submission import PBSQueue
@@ -83,6 +84,10 @@ def initialize_yaml():
 
     yaml.add_representer(u"!Whitelist", argument_representer)
     yaml.add_constructor(u"!Whitelist", lambda loader, node: _constructor(Whitelist.Whitelist, loader, node))
+
+    yaml.add_representer(u"!Blacklist", argument_representer)
+    yaml.add_constructor(u"!Blacklist", lambda loader, node: _constructor(Blacklist.Blacklist, loader, node))
+
 
     yaml.add_representer(u"!Range", argument_representer)
     yaml.add_constructor(u"!Range", lambda loader, node: _constructor(Range.Range, loader, node))
