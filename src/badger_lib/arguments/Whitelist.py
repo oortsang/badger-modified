@@ -14,10 +14,10 @@ K_IN_METADATA_PATH="in_metadata_path"
 class Whitelist(Arguments.Argument):
     def __init__(self, from_list, list_from_file, in_metadata_path, name=None, prefix=None, metadata_rules=None):
         super().__init__(name, prefix, metadata_rules)
-        if from_list:
-            raise RuntimeError("Using list is broken. Use list_from_file.")
-        if not from_list and not list_from_file:
-            raise RuntimeError("Provide either -list- or -list_from_file- argument for whitelist")
+        # if from_list:
+        #     raise RuntimeError("Using list is broken. Use list_from_file.")
+        # if not from_list and not list_from_file:
+        #     raise RuntimeError("Provide either -list- or -list_from_file- argument for whitelist")
         if not in_metadata_path:
             raise RuntimeError("For the moment, in_metadata_path is required")
         self.list = from_list

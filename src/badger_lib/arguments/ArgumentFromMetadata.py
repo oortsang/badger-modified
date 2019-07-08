@@ -43,7 +43,6 @@ class ArgumentFromMetadata(Arguments.Argument):
             f = self.format_rule
             if self.prepend:
                 f = os.path.join(self.prepend, self.format_rule)
-
             value = _get_value(item, self.sources, f, options, self.sub_key)
             # TODO: make the -missing values handling- optionally lenient
 

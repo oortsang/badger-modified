@@ -15,16 +15,18 @@ K_SUBMISSION="__submission"
 K_SUBMISSION_STATUS="submission_status"
 K_JOB_ID="job_id"
 K_FAKE_SUBMISSION="fake_submission"
+K_Crude_SUBMISSION="crude_submission"
 
 class PBSQueueSubmission:
-    def __init__(self, jobs_folder, job_name_key, fake_submission):
+    def __init__(self, jobs_folder, job_name_key, fake_submission, crude_submission):
         self.jobs_folder = jobs_folder
         self.job_name_key = job_name_key
         self.fake_submission = fake_submission
+        self.crude_submission = crude_submission
         self._counter = 0
 
     def __deepcopy__(self, memodict={}):
-        return PBSQueueSubmission(self.jobs_folder, self.job_name_key, self.fake_submission)
+        return PBSQueueSubmission(self.jobs_folder, self.job_name_key, self.fake_submission, self.crude_submission)
 
     def submit(self, item, render, configuration):
         if self.jobs_folder:
@@ -41,7 +43,7 @@ class PBSQueueSubmission:
         with open(job_path, "w") as f:
             f.write(render)
 
-        job_id = _submit(job_path, self.fake_submission)
+        job_id = _submit(job_path, self.fake_submission, self.crude_submission)
 
         Item._add_key_value_to_metadata(item, _sp("job_path"), job_path)
         status = "submitted" if job_id else "submission_failed"
@@ -51,11 +53,11 @@ class PBSQueueSubmission:
         return item
 
     def to_dict(self):
-        return {K_JOBS_FOLDER: self.jobs_folder, K_JOB_NAME_KEY:self.job_name_key, K_FAKE_SUBMISSION:self.fake_submission}
+        return {K_JOBS_FOLDER: self.jobs_folder, K_JOB_NAME_KEY:self.job_name_key, K_FAKE_SUBMISSION:self.fake_submission, K_Crude_SUBMISSION:self.crude_submission}
 
     @classmethod
     def from_dict(cls, d):
-        return PBSQueueSubmission(d.get(K_JOBS_FOLDER), d.get(K_JOB_NAME_KEY), d.get(K_FAKE_SUBMISSION))
+        return PBSQueueSubmission(d.get(K_JOBS_FOLDER), d.get(K_JOB_NAME_KEY), d.get(K_FAKE_SUBMISSION), d.get(K_Crude_SUBMISSION))
 
     def _job_path(self, item):
         if self.job_name_key:
@@ -78,10 +80,13 @@ class PBSQueueSubmission:
 
 def _sp(path): return os.path.join(K_SUBMISSION, path)
 
-def _submit(path, fake=False):
+def _submit(path, fake=False, crude=False):
     if fake:
         return path
-    command = ["qsub",path]
+    if crude:
+        command = ["bash",path]
+    else:
+        command = ["qsub",path]
     def submit():
         logging.log(7,"Submitting Command: %s", " ".join(command))
         proc = Popen(command,stdout=PIPE, stderr=PIPE)
