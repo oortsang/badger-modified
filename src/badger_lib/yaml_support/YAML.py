@@ -33,7 +33,12 @@ def _constructor(cls, loader, node):
     return  cls.from_dict(d)
 
 ########################################################################################################################
+INITIALIZED=False
+
 def initialize_yaml():
+    global INITIALIZED
+    if INITIALIZED:
+        return
     """Not really meant for use. Mostly, an interactive running convenience.."""
     _mapping_tag = yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG
 
@@ -44,54 +49,55 @@ def initialize_yaml():
         return collections.OrderedDict(loader.construct_pairs(node))
 
     yaml.add_representer(collections.OrderedDict, dict_representer)
-    yaml.add_constructor(_mapping_tag, dict_constructor)
+    yaml.add_constructor(_mapping_tag, dict_constructor, yaml.SafeLoader)
     #
     yaml.add_representer(u"!PBSQueue", argument_representer)
-    yaml.add_constructor(u"!PBSQueue", lambda loader, node: _constructor(PBSQueue.PBSQueueSubmission, loader, node))
+    yaml.add_constructor(u"!PBSQueue", lambda loader, node: _constructor(PBSQueue.PBSQueueSubmission, loader, node), yaml.SafeLoader)
     #
     yaml.add_representer(u"!MetadataOperation", argument_representer)
-    yaml.add_constructor(u"!MetadataOperation", lambda loader, node: _constructor(Arguments.MetadataOperation, loader, node))
+    yaml.add_constructor(u"!MetadataOperation", lambda loader, node: _constructor(Arguments.MetadataOperation, loader, node), yaml.SafeLoader)
     #
     yaml.add_representer(u"!SaveValueInMetadata", argument_representer)
-    yaml.add_constructor(u"!SaveValueInMetadata", lambda loader, node: _constructor(Arguments.SaveValueInMetadata, loader, node))
+    yaml.add_constructor(u"!SaveValueInMetadata", lambda loader, node: _constructor(Arguments.SaveValueInMetadata, loader, node), yaml.SafeLoader)
     #
     yaml.add_representer(u"!SaveToMetadata", argument_representer)
-    yaml.add_constructor(u"!SaveToMetadata", lambda loader, node: _constructor(Arguments.SaveToMetadata, loader, node))
+    yaml.add_constructor(u"!SaveToMetadata", lambda loader, node: _constructor(Arguments.SaveToMetadata, loader, node), yaml.SafeLoader)
     #
     yaml.add_representer(u"!ExtractFromValueWithRegexpMetadata", argument_representer)
-    yaml.add_constructor(u"!ExtractFromValueWithRegexpMetadata", lambda loader, node: _constructor(Arguments.ExtractFromValueWithRegexpMetadata, loader, node))
+    yaml.add_constructor(u"!ExtractFromValueWithRegexpMetadata", lambda loader, node: _constructor(Arguments.ExtractFromValueWithRegexpMetadata, loader, node), yaml.SafeLoader)
     #
     yaml.add_representer(u"!MapMetadataValue", argument_representer)
-    yaml.add_constructor(u"!MapMetadataValue", lambda loader, node: _constructor(Arguments.MapMetadataValue, loader, node))
+    yaml.add_constructor(u"!MapMetadataValue", lambda loader, node: _constructor(Arguments.MapMetadataValue, loader, node), yaml.SafeLoader)
     #
     yaml.add_representer(u"!Scalar", argument_representer)
-    yaml.add_constructor(u"!Scalar", lambda loader, node: _constructor(Scalar.Scalar, loader, node))
+    yaml.add_constructor(u"!Scalar", lambda loader, node: _constructor(Scalar.Scalar, loader, node), yaml.SafeLoader)
     #
     yaml.add_representer(u"!ArgumentFromMetadata", argument_representer)
-    yaml.add_constructor(u"!ArgumentFromMetadata", lambda loader, node: _constructor(ArgumentFromMetadata.ArgumentFromMetadata, loader, node))
+    yaml.add_constructor(u"!ArgumentFromMetadata", lambda loader, node: _constructor(ArgumentFromMetadata.ArgumentFromMetadata, loader, node), yaml.SafeLoader)
     #
     yaml.add_representer(u"!FilesInFolder", argument_representer)
-    yaml.add_constructor(u"!FilesInFolder", lambda loader, node: _constructor(FilesInFolder.FilesInFolder, loader, node))
+    yaml.add_constructor(u"!FilesInFolder", lambda loader, node: _constructor(FilesInFolder.FilesInFolder, loader, node), yaml.SafeLoader)
 
     yaml.add_representer(u"!ExtractFromFileNameRegexpMetadata", argument_representer)
-    yaml.add_constructor(u"!ExtractFromFileNameRegexpMetadata", lambda loader, node: _constructor(FilesInFolder.ExtractFromFileNameRegexpMetadata, loader, node))
+    yaml.add_constructor(u"!ExtractFromFileNameRegexpMetadata", lambda loader, node: _constructor(FilesInFolder.ExtractFromFileNameRegexpMetadata, loader, node), yaml.SafeLoader)
     #
     yaml.add_representer(u"!RulesMap", argument_representer)
-    yaml.add_constructor(u"!RulesMap", lambda loader, node: _constructor(RulesMap.RulesMap, loader, node))
+    yaml.add_constructor(u"!RulesMap", lambda loader, node: _constructor(RulesMap.RulesMap, loader, node), yaml.SafeLoader)
 
     yaml.add_representer(u"!RulesMapGetKeyMetadata", argument_representer)
-    yaml.add_constructor(u"!RulesMapGetKeyMetadata", lambda loader, node: _constructor(RulesMap.RulesMapGetKeyMetadata, loader, node))
+    yaml.add_constructor(u"!RulesMapGetKeyMetadata", lambda loader, node: _constructor(RulesMap.RulesMapGetKeyMetadata, loader, node), yaml.SafeLoader)
 
     yaml.add_representer(u"!Whitelist", argument_representer)
-    yaml.add_constructor(u"!Whitelist", lambda loader, node: _constructor(Whitelist.Whitelist, loader, node))
+    yaml.add_constructor(u"!Whitelist", lambda loader, node: _constructor(Whitelist.Whitelist, loader, node), yaml.SafeLoader)
 
     yaml.add_representer(u"!Blacklist", argument_representer)
-    yaml.add_constructor(u"!Blacklist", lambda loader, node: _constructor(Blacklist.Blacklist, loader, node))
-
+    yaml.add_constructor(u"!Blacklist", lambda loader, node: _constructor(Blacklist.Blacklist, loader, node), yaml.SafeLoader)
 
     yaml.add_representer(u"!Range", argument_representer)
-    yaml.add_constructor(u"!Range", lambda loader, node: _constructor(Range.Range, loader, node))
+    yaml.add_constructor(u"!Range", lambda loader, node: _constructor(Range.Range, loader, node), yaml.SafeLoader)
 
+
+    INITIALIZED=True
 
 def _patch(configuration, sub):
     if type(configuration) == list and type(sub) == list:
@@ -126,7 +132,7 @@ def _flatify_import(configuration):
         logging.info("Preloading %s", x)
         p = os.path.join(base_path, x["path"])
         with open(p) as f:
-            sub = yaml.load(f)
+            sub = yaml.safe_load(f)
         c = _patch(c, sub)
 
     if Configuration.K_ARGUMENTS in c:
@@ -136,9 +142,8 @@ def _flatify_import(configuration):
     return c
 
 def load_yaml(path):
-    initialize_yaml()
     with open(path) as f:
-        configuration = yaml.load(f)
+        configuration = yaml.safe_load(f)
     configuration[Configuration.K_CONFIGURATION_SOURCE] = path
     configuration = _flatify_import(configuration)
     return configuration
