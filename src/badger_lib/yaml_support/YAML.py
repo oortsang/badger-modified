@@ -131,6 +131,9 @@ def _flatify_import(configuration):
     for x in sub_pre_argument:
         logging.info("Preloading %s", x)
         p = os.path.join(base_path, x["path"])
+        if x["optional"] and not os.path.exists(p):
+            logging.info("Missing optional spec, skipping")
+            continue
         with open(p) as f:
             sub = yaml.safe_load(f)
         c = _patch(c, sub)
