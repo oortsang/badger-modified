@@ -56,11 +56,11 @@ class FilesInFolder(Arguments.Argument):
 
 
 class ExtractFromFileNameRegexpMetadata(Arguments.ExtractFromValueWithRegexpMetadata):
-    def __init__(self, strict, name=None, path=None):
-        super().__init__(None, strict, name, path)
+    def __init__(self, strict, name=None, path=None, paths=None):
+        super().__init__(None, strict, name, path, paths)
 
     def __deepcopy__(self, memodict={}):
-        return ExtractFromFileNameRegexpMetadata(self.strict, self.name, self.path)
+        return ExtractFromFileNameRegexpMetadata(self.strict, self.name, self.path, self.paths)
 
     def __call__(self, item, argument, value, *args, **kwargs):
         if not isinstance(argument, FilesInFolder):
@@ -75,4 +75,4 @@ class ExtractFromFileNameRegexpMetadata(Arguments.ExtractFromValueWithRegexpMeta
 
     @classmethod
     def from_dict(cls, d):
-        return ExtractFromFileNameRegexpMetadata(d.get(Arguments.K_STRICT), name=d.get(Arguments.K_NAME), path=d.get(Arguments.K_PATH))
+        return ExtractFromFileNameRegexpMetadata(d.get(Arguments.K_STRICT), name=d.get(Arguments.K_NAME), path=d.get(Arguments.K_PATH), paths=d.get(Arguments.K_PATHS))

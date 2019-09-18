@@ -93,15 +93,19 @@ class SaveValueInMetadata(MetadataRule):
 
 K_REGEXP="regexp"
 K_STRICT="strict"
+K_PATHS="paths"
 
 class ExtractFromValueWithRegexpMetadata(MetadataRule):
-    def __init__(self, regexp, strict, name=None, path=None):
+    def __init__(self, regexp, strict, name=None, path=None, paths=None):
         super().__init__(name, path)
         self.strict = strict
         self.regexp = re.compile(regexp) if regexp else None
+        self.paths = paths
+        if path and paths:
+            raise RuntimeError("Specify only path or paths in regexp-based rule")
 
     def __deepcopy__(self, memodict={}):
-        return ExtractFromValueWithRegexpMetadata(self.regexp.pattern, self.strict, self.name, self.path)
+        return ExtractFromValueWithRegexpMetadata(self.regexp.pattern, self.strict, self.name, self.path, self.paths)
 
     def __call__(self, item, argument,value, *args, **kwargs):
         logging.log(5, "Extracting {} from {}".format(self.regexp.pattern, value))
@@ -112,18 +116,24 @@ class ExtractFromValueWithRegexpMetadata(MetadataRule):
             raise RuntimeError("Metadata extract operation failed in strict mode")
 
         if s:
-            v = s.group(1)
-            Item._add_key_value_to_metadata(item, self.path, v)
+            if self.path:
+                v = s.group(1)
+                Item._add_key_value_to_metadata(item, self.path, v)
+            elif self.paths:
+                for i in range(0,len(self.paths)):
+                    v = s.group(i+1)
+                    Item._add_key_value_to_metadata(item, self.paths[i], v)
 
     def to_dict(self):
         d = super().to_dict()
         d[K_REGEXP] = self.regexp.pattern
         d[K_STRICT] = self.strict
+        d[K_PATH] = self.path
         return d
 
     @classmethod
     def from_dict(cls, d):
-        return cls(d.get(K_REGEXP), d.get(K_STRICT), name=d.get(K_NAME), path=d.get(K_PATH))
+        return cls(d.get(K_REGEXP), d.get(K_STRICT), name=d.get(K_NAME), path=d.get(K_PATH), paths=d.get(K_PATHS))
 
 K_FROM_METADATA_PATH = "from_metadata_path"
 K_TO_METADATA_PATH = "to_metadata_path"
