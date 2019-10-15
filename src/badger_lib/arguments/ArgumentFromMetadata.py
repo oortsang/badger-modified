@@ -45,7 +45,6 @@ class ArgumentFromMetadata(Arguments.Argument):
                 f = os.path.join(self.prepend, self.format_rule)
             value = _get_value(item, self.sources, f, options, self.sub_key)
             # TODO: make the -missing values handling- optionally lenient
-
             #if value and self.prepend:
             #    value = os.path.join(self.prepend, value)
             yield item, value
