@@ -1,4 +1,4 @@
-i__author__ = "alvaro barbeira"
+__author__ = "alvaro barbeira"
 import logging
 import os
 import sys

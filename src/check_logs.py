@@ -70,7 +70,9 @@ if __name__ == "__main__":
     parser.add_argument("--resubmit_log_only", help="wether to submit missing jobs", action="store_true")
     parser.add_argument("--name_subfield", help="Specify multiple key-value pairs to specify format conversion", nargs=2, action="append", default =[])
     parser.add_argument("--name_subfield_regexp", help="Specify multiple key-value pairs to specify format conversion")
-    parser.add_argument("--clean_target", help="pattern of stuff to be removed", action="append", default=[])
+    parser.add_argument("--clean_target", help="pattern of stuff to be removed."
+                                               " Note this is not a Regex. "
+                                               "It uses the Linux path expansions like *", action="append", default=[])
 
     #parser.add_argument("--serialize_local", help="If resubmitting job, just run locally", action="store_true", default=False)
     #parser.add_argument("--log_file", help="On top of everything else, save to a file")
