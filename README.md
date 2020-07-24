@@ -5,10 +5,8 @@ badger is a tool to generate and automate job submission on an HPC cluster. It w
 # TODO:
 
 1. Documentation
-    1. Main README
     1. Document Features in the Wiki
     1. Make an educated guess about the header for the example SLURM submission.
-    1. Make an example submission YAML
 1. SLURM compatibility
 1. Controlled "Naive submission"
 1. `ensure_paths` option for arguments
