@@ -44,33 +44,33 @@ The following will be a brief introduction to the required parts of the YAML fil
 
 The definitions specify important metadata parts of the submission, such as logging paths, the type of HPC submission cluster, preparation commands, etc. 
 
-##### command
+#### command
 
 One fillable argument in the submission template must be named `command`, and it must be specified. This is usually used for the main command being executed by each job. 
 
-##### template
+#### template
 
 Specify the location of the submission template with respect to the location of the YAML file. 
 
-##### copy_to_item 
+#### copy_to_item 
 
 ??? TODO
 
-##### default_arguments
+#### default_arguments
 
 If the `arguments` section doesn't specify a field which appears in the submission template, it will be filled in with a value from this list, if possible. I usually specify job resource requirements here. 
 
-##### submission
+#### submission
 
 Specify (with a tag) the type of submission queue. Currently, the only implemented tag is `!PBSQueue`. 
 We hope to implement `!SLURMQueue` soon. 
 Keys under this tag include `jobs_folder` which specifies the path to which the jobs will be written; `job_name_key` the argument which specifies the filename of each job (usually I use `job_name` argument); `fake_submission` which when specified and marked `true` only writes the job files but doesn't submit or execute them. 
 
-##### constants
+#### constants
 
 This is a good place to specify long reused filepaths with YAML's anchor functionality. 
 
-##### pre_command
+#### pre_command
 
 Specify a bash string to run before doing anything else, such as setting up result directories. Don't worry about setting up the folders for `jobs_folder` or `logs_folder`. 
 
@@ -80,15 +80,15 @@ There are a bunch of ways to specify arguments. For an exhaustive list, go to th
 
 There are often multiple dynamic arguments specified. In the `example_submission.yaml`, we see two different Ranges specified. Badger's default behavior is to create one job for each unique element in the cartesian product of these dynamic argument sets. For `example_submission.yaml`, that means that there is one job for each (`chromosome`, `batch`) pair, or 220 total jobs.
 
-##### !Scalar
+#### !Scalar
 
 These arguments stay the same for each job. The `name` key defines where in the template this argument should go, `prefix` and `value` allow you to separate the command-line flag from its value. `prepend` works for file paths, and it makes a neat filepath with `prepend` before `value`. 
 
-###### !Range
+#### !Range
 
 These arguments form a range of integers. Besides the things that can be specified for `!Scalar`, one must specify `start` and `end`. 
 
-###### !FilesInFolder
+#### !FilesInFolder
 
 This creates a list of files in a specific folder. Be sure to specify `folder`. One neat functionality is to specify `regexp_filter`. Only matched filenames will be added to the list. What's more, if there are capture groups specified in the regex, these groups can be saved in the metadata (More about that in the wiki). 
 
