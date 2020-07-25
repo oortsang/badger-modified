@@ -20,7 +20,7 @@ from ..arguments import Whitelist
 from ..arguments import Blacklist
 from ..arguments import Range
 
-from ..submission import PBSQueue
+from ..submission import PBSQueue, SLURMQueue
 
 from .. import Configuration
 
@@ -53,6 +53,10 @@ def initialize_yaml():
     #
     yaml.add_representer(u"!PBSQueue", argument_representer)
     yaml.add_constructor(u"!PBSQueue", lambda loader, node: _constructor(PBSQueue.PBSQueueSubmission, loader, node), yaml.SafeLoader)
+    #
+    yaml.add_representer(u"!SLURMQueue", argument_representer)
+    yaml.add_constructor(u"!SLURMQueue", lambda loader, node: _constructor(SLURMQueue.SLURMQueueSubmission, loader, node),
+                         yaml.SafeLoader)
     #
     yaml.add_representer(u"!MetadataOperation", argument_representer)
     yaml.add_constructor(u"!MetadataOperation", lambda loader, node: _constructor(Arguments.MetadataOperation, loader, node), yaml.SafeLoader)
