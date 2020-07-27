@@ -86,7 +86,7 @@ class QueueSubmission:
         return p
 
     def explain(self, item):
-        status =Item._get_metadata(item, _sp(K_SUBMISSION_STATUS))
+        status =Item._get_metadata(item, self._sp(K_SUBMISSION_STATUS))
         name = "anonimous"
         if self.job_name_key and \
                 (self.job_name_key in item[Configuration.K_ARGUMENTS]):
