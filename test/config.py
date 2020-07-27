@@ -1,0 +1,5 @@
+
+BOOL_RUN_SBATCH = False
+BOOL_RUN_QSUB = False
+
+K_TEST_WORKSPACE = "temp"

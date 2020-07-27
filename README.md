@@ -58,8 +58,7 @@ If the `arguments` section doesn't specify a field which appears in the submissi
 
 #### submission
 
-Specify (with a tag) the type of submission queue. Currently, the only implemented tag is `!PBSQueue`. 
-We hope to implement `!SLURMQueue` soon. 
+Specify (with a tag) the type of submission queue. Currently, the implemented tags are `!PBSQueue` and `!SLURMQueue`.
 Keys under this tag include `jobs_folder` which specifies the path to which the jobs will be written; `job_name_key` the argument which specifies the filename of each job (usually I use `job_name` argument); `fake_submission` which when specified and marked `true` only writes the job files but doesn't submit or execute them. 
 
 #### constants

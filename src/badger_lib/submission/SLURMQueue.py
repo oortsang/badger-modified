@@ -7,25 +7,27 @@ from subprocess import Popen, PIPE
 
 from . import Queue
 
-K_JOBS_FOLDER="jobs_folder"
-K_JOB_NAME_KEY="job_name_key"
-K_SUBMISSION="__submission"
-K_SUBMISSION_STATUS="submission_status"
-K_JOB_ID="job_id"
-K_FAKE_SUBMISSION="fake_submission"
-K_Crude_SUBMISSION="crude_submission"
+K_JOBS_FOLDER = "jobs_folder"
+K_JOB_NAME_KEY = "job_name_key"
+K_SUBMISSION = "__submission"
+K_SUBMISSION_STATUS = "submission_status"
+K_JOB_ID = "job_id"
+K_FAKE_SUBMISSION = "fake_submission"
+K_Crude_SUBMISSION = "crude_submission"
+K_SUBMIT_FUNCTION="submit_function"
 
 
-class PBSQueueSubmission(Queue.QueueSubmission):
+class SLURMQueueSubmission(Queue.QueueSubmission):
     def __init__(self, jobs_folder, job_name_key, fake_submission):
-        super(PBSQueueSubmission, self).__init__(jobs_folder, job_name_key,
+        super(SLURMQueueSubmission, self).__init__(jobs_folder, job_name_key,
                                                  fake_submission,
-                                                 PBS_submit)
+                                                 SLURM_submit)
 
     def __deepcopy__(self, memodict={}):
-        return PBSQueueSubmission(self.jobs_folder,
+        return SLURMQueueSubmission(self.jobs_folder,
                                     self.job_name_key,
                                     self.fake_submission)
+
     def to_dict(self):
         return {K_JOBS_FOLDER: self.jobs_folder,
                 K_JOB_NAME_KEY: self.job_name_key,
@@ -33,14 +35,16 @@ class PBSQueueSubmission(Queue.QueueSubmission):
 
     @classmethod
     def from_dict(cls, d):
-        return PBSQueueSubmission(d.get(K_JOBS_FOLDER),
-                               d.get(K_JOB_NAME_KEY),
-                               d.get(K_FAKE_SUBMISSION))
+        return SLURMQueueSubmission(d.get(K_JOBS_FOLDER),
+                                    d.get(K_JOB_NAME_KEY),
+                                    d.get(K_FAKE_SUBMISSION))
 
-def PBS_submit(path):
-    command = ["qsub", path]
+
+def SLURM_submit(path):
+    command = ["sbatch", path]
+
     def submit():
-        logging.log(7,"Submitting Command: %s", " ".join(command))
+        logging.log(7, "Submitting Command: %s", " ".join(command))
         proc = Popen(command, stdout=PIPE, stderr=PIPE)
         out, err = proc.communicate()
         exitcode = proc.returncode

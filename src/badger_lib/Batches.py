@@ -7,7 +7,7 @@ from collections import OrderedDict
 from subprocess import call
 
 from . import Item, Configuration
-from badger_lib.yaml_support import YAML
+from .yaml_support import YAML
 
 ########################################################################################################################
 

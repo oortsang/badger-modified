@@ -1,0 +1,58 @@
+---
+definitions:
+
+  # command and template must always be specified.
+  command: "python /path/to/python/script.py"
+  template: ../templates/SLURM_template.jinja
+
+  copy_to_item: true
+
+  default_arguments:
+    job_memory: "4gb"
+    job_walltime: "6:00:00"
+    logs_folder: logs
+
+  # This specifies what the script does once an individual file is generated.
+  submission:
+    !SLURMQueue
+      jobs_folder: jobs
+      job_name_key: job_name # Jobs will be written to job_name.sh files with the generated job_name argument filled in.
+      fake_submission: true # Specifying this just writes the files and does not run a submission command.
+
+  # You can use YAML's built-in & and * things to make everything more neat
+  constants:
+    genotype_dir: &GENO_DIR /scratch/meliao/ukb_images/geno_data/
+    pheno_file: &PHENO_FILE /scratch/meliao/ukb_images/pheno_data/2020-05-18_final-phenotypes_train.parquet
+    sub_batches: &SUB_BATCHES 10
+
+  # Right now, this is how we make sure the necessary directories are in place.
+  # This is a great candidate for feature upgrade.
+  pre_command:
+  - 'mkdir -p results/models_final'
+
+# There are a lot of different types of arguments, and only a few are shown here.
+arguments:
+
+  - !Scalar { name: argument_1, prefix: "-frequency_filter", value: 0.01 }
+  - !Scalar { name: argument_2, prefix: "-window", value: "100000" }
+
+  - !FilesInFolder
+    name: argument_3
+    prefix: "-chromosome"
+    folder: "test/resources/dummy_files"
+    regexp_filter: "file_name_pattern_one_(.*).txt"
+    metadata_rules:
+      - !ExtractFromFileNameRegexpMetadata
+        paths: [ chr ]
+
+  - !ArgumentFromMetadata
+    name: argument_4
+    prefix: "-genotype_fp"
+    prepend: *GENO_DIR
+    format_rule: "genotype_file_chr-{chr}.vcf.gz"
+    sources: [ { path: chr, destination: chr } ]
+
+  - !ArgumentFromMetadata
+    name: job_name
+    format_rule: "example-submission_chr-{chr}"
+    sources: [ { path: chr, destination: chr } ]

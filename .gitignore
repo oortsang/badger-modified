@@ -40,3 +40,7 @@ __exp
 
 kk_*
 src/kk_*
+
+# From the example
+
+jobs/
