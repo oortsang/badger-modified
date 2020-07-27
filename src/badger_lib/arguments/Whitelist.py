@@ -1,4 +1,4 @@
-from badger_lib.arguments.Arguments import _load
+from .Arguments import _load
 
 __author__ = "alvaro barbeira"
 

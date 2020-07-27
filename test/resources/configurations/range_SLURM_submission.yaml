@@ -3,7 +3,7 @@ definitions:
 
   # command and template must always be specified.
   command: "python /path/to/python/script.py"
-  template: ../templates/SLURM_template.jinja
+  template: ../SLURM_template
 
   copy_to_item: true
 
@@ -14,7 +14,7 @@ definitions:
 
   # This specifies what the script does once an individual file is generated.
   submission:
-    !PBSQueue
+    !SLURMQueue
       jobs_folder: jobs
       job_name_key: job_name # Jobs will be written to job_name.sh files with the generated job_name argument filled in.
       fake_submission: true # Specifying this just writes the files and does not run a submission command.
@@ -35,26 +35,16 @@ arguments:
 
   - !Scalar { name: argument_1, prefix: "-frequency_filter", value: 0.01 }
   - !Scalar { name: argument_2, prefix: "-window", value: "100000" }
-  - !Scalar { name: argument_3, prefix: "-parsimony", value: "8" }
-  - !Scalar { name: argument_4, prefix: "-pheno_fp", value: *PHENO_FILE }
-  - !Scalar { name: argument_5, prefix: "-sub_batches", value: *SUB_BATCHES }
 
   - !Range
-    name: argument_6
+    name: argument_3
     prefix: "-chromosome"
     start: 1
     end: 23
     metadata_rules: [ !SaveValueInMetadata { path: chr }]
 
-  - !Range
-    name: argument_7
-    prefix: "-sub_batch"
-    start: 0
-    end: *SUB_BATCHES
-    metadata_rules: [ !SaveValueInMetadata { path: batch }]
-
   - !ArgumentFromMetadata
-    name: argument_8
+    name: argument_4
     prefix: "-genotype_fp"
     prepend: *GENO_DIR
     format_rule: "genotype_file_chr-{chr}.vcf.gz"
@@ -62,6 +52,5 @@ arguments:
 
   - !ArgumentFromMetadata
     name: job_name
-    format_rule: "example-submission_chr-{chr}_batch-{batch}"
-    sources: [ { path: chr, destination: chr },
-               { path: batch, destination: batch } ]
+    format_rule: "example-submission_chr-{chr}"
+    sources: [ { path: chr, destination: chr } ]
