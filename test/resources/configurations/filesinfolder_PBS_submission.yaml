@@ -36,12 +36,14 @@ arguments:
   - !Scalar { name: argument_1, prefix: "-frequency_filter", value: 0.01 }
   - !Scalar { name: argument_2, prefix: "-window", value: "100000" }
 
-  - !Range
+  - !FilesInFolder
     name: argument_3
     prefix: "-chromosome"
-    start: 1
-    end: 23
-    metadata_rules: [ !SaveValueInMetadata { path: chr }]
+    folder: "test/resources/dummy_files"
+    regexp_filter: "file_name_pattern_one_(.*).txt"
+    metadata_rules:
+      - !ExtractFromFileNameRegexpMetadata
+        paths: [ chr ]
 
   - !ArgumentFromMetadata
     name: argument_4

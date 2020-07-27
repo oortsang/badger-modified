@@ -3,7 +3,7 @@ definitions:
 
   # command and template must always be specified.
   command: "python /path/to/python/script.py"
-  template: ../SLURM_template
+  template: ../templates/SLURM_template.jinja
 
   copy_to_item: true
 
