@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import time
 
+
 def configure_logging(level=5, target=sys.stderr, log_file=None):
     logger = logging.getLogger()
     logger.setLevel(level)
@@ -38,6 +39,7 @@ def check_present(path, token, error_token=None):
                 break
     return present and not failed
 
+
 def clean_target(target):
     paths = glob.glob(target)
     if not paths:
@@ -53,11 +55,20 @@ def clean_target(target):
         except Exception as e:
             logging.exception("Error with " + path)
 
-def post_check(r, resubmit=False, resubmit_log_only=False, clean_targets=None, subfield_names=None, subfield_positions=None, check_product=None):
+
+def post_check(
+    r,
+    resubmit=False,
+    resubmit_log_only=False,
+    clean_targets=None,
+    subfield_names=None,
+    subfield_positions=None,
+    check_product=None,
+):
     if r.job_name.shape[0] != r.job_name.drop_duplicates().shape[0]:
         raise RuntimeError("Won't take duplicate job names")
 
-    redone=[]
+    redone = []
     for t in r.itertuples():
         if resubmit_log_only and not (type(t.log_path) == str and len(t.log_path) > 1):
             continue
@@ -65,12 +76,12 @@ def post_check(r, resubmit=False, resubmit_log_only=False, clean_targets=None, s
         redo = False
         if not t.complete:
             logging.info("Logs mark this for redo")
-            redo=True
+            redo = True
         elif check_product:
             for product, pattern in check_product:
-                if not getattr(t,product):
+                if not getattr(t, product):
                     logging.info("Missing product [%s] marks this for redo", product)
-                    redo=True
+                    redo = True
                     break
 
         if redo and resubmit:
@@ -96,7 +107,7 @@ def post_check(r, resubmit=False, resubmit_log_only=False, clean_targets=None, s
 
 def parse_with_regexp(folder, regexp):
     files = sorted([x for x in os.listdir(folder) if regexp.search(x)])
-    paths = [os.path.join(folder,x) for x in files]
+    paths = [os.path.join(folder, x) for x in files]
     names = [regexp.search(x).group(1) for x in files]
     return names, paths
 
@@ -110,10 +121,12 @@ def identify_with_regexp(folder, regexp):
             by_name[r.group(1)] = f
     return by_name
 
+
 def ensure_requisite_folders(path):
     folder = os.path.split(path)[0]
     if len(folder) and not os.path.exists(folder):
         os.makedirs(folder)
+
 
 def name_parse_prepare(name_subfield_regexp, name_subfield):
     if name_subfield and name_subfield_regexp:
@@ -125,6 +138,7 @@ def name_parse_prepare(name_subfield_regexp, name_subfield):
         subfield_names = None
         subfield_positions = None
     return r, subfield_names, subfield_positions
+
 
 def name_parse(name, subfield_regexp, subfield_positions):
     if subfield_positions:
@@ -139,4 +153,4 @@ def name_parse(name, subfield_regexp, subfield_positions):
 
 
 def argumentize(subfield_names, subfield_positions, values):
-    return {subfield_names[i-1]:values[i-1] for i in subfield_positions}
+    return {subfield_names[i - 1]: values[i - 1] for i in subfield_positions}
