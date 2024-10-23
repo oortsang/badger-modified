@@ -7,6 +7,7 @@ from collections import OrderedDict
 from subprocess import call
 
 from . import Item, Configuration
+from .submission import Queue
 from .yaml_support import YAML
 
 ########################################################################################################################
@@ -27,7 +28,7 @@ def process(configuration_path, page_width=None, page=None):
     #Todo: reentrant initialization?
     YAML.initialize_yaml()
     configuration = YAML.load_yaml(configuration_path)
-    _process(configuration, page_width, page)
+    return _process(configuration, page_width, page)
 
 def _parse_configuration(configuration):
     template = Item._template(configuration)
@@ -95,9 +96,12 @@ def _process(configuration, page_width=None, page=None):
         start_index = None
         end_index = None
 
+    # import pdb; pdb.set_trace()
     logging.info("Submitting...")
     submission = configuration[Configuration.K_DEFINITIONS][Configuration.K_SUBMISSION]
-    submitted =[]
+    logging.info(f"Submitting jobs with overwrite_scripts={submission.overwrite_scripts}")
+    submitted = []
+    script_fp_list  = []
     for i, item in enumerate(command_set):
         if start_index is not None and i<start_index:
             logging.log(8, "Skipping job %i", i)
@@ -109,7 +113,11 @@ def _process(configuration, page_width=None, page=None):
         item_render = _render(item, configuration, template)
         item = submission.submit(item, item_render, configuration)
         submitted.append(item)
+
+        script_fp_list.append(item[Item.K_METADATA][Queue.K_SUBMISSION].get("job_path", None))
         #TODO: clean up lookup
         logging.log(9, "Submitted job: %s", submission.explain(item))
 
     logging.info("Submitted")
+    logging.info(f"script fps: {script_fp_list}")
+    return submitted, script_fp_list

@@ -16,12 +16,14 @@ K_FAKE_SUBMISSION = "fake_submission"
 K_Crude_SUBMISSION = "crude_submission"
 K_SUBMIT_FUNCTION = "submit_function"
 CONST_SLEEP_TIME = 1.0
+K_OVERWRITE_SCRIPTS = "overwrite_scripts"
 
 
 class SLURMQueueSubmission(Queue.QueueSubmission):
-    def __init__(self, jobs_folder, job_name_key, fake_submission):
+    def __init__(self, jobs_folder, job_name_key, fake_submission, overwrite_scripts=False):
         super(SLURMQueueSubmission, self).__init__(
-            jobs_folder, job_name_key, fake_submission, SLURM_submit
+            jobs_folder, job_name_key, fake_submission, SLURM_submit,
+            overwrite_scripts=overwrite_scripts,
         )
 
     def __deepcopy__(self, memodict={}):
@@ -34,12 +36,14 @@ class SLURMQueueSubmission(Queue.QueueSubmission):
             K_JOBS_FOLDER: self.jobs_folder,
             K_JOB_NAME_KEY: self.job_name_key,
             K_FAKE_SUBMISSION: self.fake_submission,
+            K_OVERWRITE_SCRIPTS: self.overwrite_scripts,
         }
 
     @classmethod
     def from_dict(cls, d):
         return SLURMQueueSubmission(
-            d.get(K_JOBS_FOLDER), d.get(K_JOB_NAME_KEY), d.get(K_FAKE_SUBMISSION)
+            d.get(K_JOBS_FOLDER), d.get(K_JOB_NAME_KEY), d.get(K_FAKE_SUBMISSION),
+            d.get(K_OVERWRITE_SCRIPTS, False), # by default, don't overwrite
         )
 
 

@@ -19,12 +19,14 @@ K_SUBMIT_FUNCTION="submit_function"
 
 class QueueSubmission:
     def __init__(self, jobs_folder, job_name_key, fake_submission,
-                 submit_f):
+                 submit_f, overwrite_scripts=False):
         self.jobs_folder = jobs_folder
         self.job_name_key = job_name_key
         self.fake_submission = fake_submission
         self.submit_f = submit_f
         self._counter = 0
+        # logging.info(f"QueueSubmission received overwrite_scripts={overwrite_scripts}")
+        self.overwrite_scripts = overwrite_scripts
 
     def __deepcopy__(self, memodict={}):
         return QueueSubmission(self.jobs_folder, self.job_name_key,
@@ -36,9 +38,11 @@ class QueueSubmission:
                 os.makedirs(self.jobs_folder)
 
         item = copy.deepcopy(item)
+        # print(f"Item Args: {item['arguments'].keys()}")
+        # print(f"Item Metadata: {item['metadata'].keys()}")
 
         job_path = self._job_path(item)
-        if os.path.exists(job_path):
+        if os.path.exists(job_path) and not self.overwrite_scripts:
             logging.info("%s already exists, skipping", job_path)
             Item._add_key_value_to_metadata(item, self._sp(K_SUBMISSION_STATUS), "skipped")
             return item
@@ -74,6 +78,7 @@ class QueueSubmission:
                                d.get(K_SUBMIT_FUNCTION))
 
     def _job_path(self, item):
+        # print(f"self.job_name_key: {self.job_name_key}")
         if self.job_name_key:
             p = "{}.sh".format(Item._get_argument_value(item, self.job_name_key))
         else:
@@ -97,4 +102,3 @@ class QueueSubmission:
     @staticmethod
     def _sp(path):
         return os.path.join(K_SUBMISSION, path)
-
